@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Alumni {
+  id            String   @id @default(cuid())
+  name          String
+  cgpa          Float
+  workExperience Float
+  branch        String
+  university    String
+  course        String?
+  location      String?
+  admittedYear  Int?
+  mastersEnd    Int?      // Master's end year
+  mastersGrade  Float?    // Master's grade
+  msSkills      String?   // MS Skills
+  bachelorsBatch Int?     // Bachelor's Degree Batch
+  college       String
+  tenthPercentage Float?
+  twelfthPercentage Float?
+  companySector String?
+  designation   String?
+  linkedInProfile String?
+  workExperiences Json?  // Array of all work experiences: [{duration, company, designation, type}]
+  createdAt     DateTime @default(now())
+
+  @@index([college, branch, cgpa, workExperience])
+}
+
+model WaitlistEmail {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model MatchResult {
+  id          String   @id @default(cuid())
+  userCGPA    Float
+  userWorkEx  Float
+  userBranch  String
+  userCollege String
+  userCourses String[]
+  universities Json
+  createdAt   DateTime @default(now())
+}
+
