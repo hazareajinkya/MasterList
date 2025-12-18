@@ -329,7 +329,7 @@ export async function findMatchingUniversities(
     }
 
     // Convert to MatchedUniversity array
-    const matchedUniversities: MatchedUniversity[] = Array.from(universityMap.values()).map((uni) => {
+    let matchedUniversities: MatchedUniversity[] = Array.from(universityMap.values()).map((uni) => {
     const avgScore = Math.round(
       uni.scores.reduce((sum, score) => sum + score, 0) / uni.scores.length
     );
@@ -361,7 +361,13 @@ export async function findMatchingUniversities(
              !universityName.includes('iiit-h');
     });
 
-    // Sort by match percentage (descending)
+    // Filter out Indian universities (hide them for now)
+    matchedUniversities = matchedUniversities.filter((uni) => {
+      const location = (uni.location || '').toUpperCase();
+      return !location.includes('INDIA') && location !== 'IN';
+    });
+
+    // Sort by match percentage (descending) - all are abroad now
     matchedUniversities.sort((a, b) => b.matchPercentage - a.matchPercentage);
 
     return matchedUniversities;
