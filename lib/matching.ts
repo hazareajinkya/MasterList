@@ -39,7 +39,8 @@ interface AlumniMatch {
 
 // Course mapping for similarity
 const courseMapping: Record<string, string[]> = {
-  'Computer Science': ['Computer Science', 'CS', 'Computer Engineering', 'Software Engineering'],
+  'Computer Science': ['Computer Science', 'CS', 'Computer Engineering', 'Software Engineering', 'IT', 'Information Technology'],
+  'Information Technology': ['Information Technology', 'IT', 'Computer Science', 'CS', 'Computer Engineering'],
   'Mechanical Engineering': ['Mechanical Engineering', 'Mechanical', 'ME'],
   'Civil Engineering': ['Civil Engineering', 'Civil', 'CE'],
   'Artificial Intelligence': ['Artificial Intelligence', 'AI', 'Machine Learning', 'Data Science'],
@@ -124,17 +125,40 @@ function calculateMatchScore(
   const normalizedUserBranch = normalizeBranch(userProfile.bachelorsBranch || userProfile.courses?.[0] || '');
   const normalizedAlumniBranch = normalizeBranch(alumni.branch);
   
+  // Special handling for IT/Information Technology
+  const isIT = normalizedUserBranch.includes('information technology') || normalizedUserBranch === 'it';
+  const isAlumniIT = normalizedAlumniBranch === 'it' || normalizedAlumniBranch.includes('information technology');
+  const isAlumniCS = normalizedAlumniBranch.includes('computer science') || normalizedAlumniBranch === 'cs';
+  
   if (normalizedUserBranch === normalizedAlumniBranch) {
     score += 20; // Exact match
+  } else if (isIT && (isAlumniIT || isAlumniCS)) {
+    score += 18; // IT matches IT or CS
   } else if (normalizedAlumniBranch.includes(normalizedUserBranch) || normalizedUserBranch.includes(normalizedAlumniBranch)) {
     score += 15; // Partial match
   } else {
-    // Check for similar branches
-    const userBranchWords = normalizedUserBranch.split(/\s+/);
-    const alumniBranchWords = normalizedAlumniBranch.split(/\s+/);
-    const commonWords = userBranchWords.filter(word => alumniBranchWords.includes(word) && word.length > 3);
-    if (commonWords.length >= 1) {
-      score += 10; // Weak match
+    // Check for similar branches using course mapping
+    const userBranchVariants = courseMapping[userProfile.bachelorsBranch] || [normalizedUserBranch];
+    const alumniBranchVariants = courseMapping[alumni.branch] || [normalizedAlumniBranch];
+    
+    const hasCommonVariant = userBranchVariants.some(v1 => 
+      alumniBranchVariants.some(v2 => 
+        normalizeBranch(v1) === normalizeBranch(v2) ||
+        normalizeBranch(v1).includes(normalizeBranch(v2)) ||
+        normalizeBranch(v2).includes(normalizeBranch(v1))
+      )
+    );
+    
+    if (hasCommonVariant) {
+      score += 12; // Match via course mapping
+    } else {
+      // Check for similar branches by common words
+      const userBranchWords = normalizedUserBranch.split(/\s+/);
+      const alumniBranchWords = normalizedAlumniBranch.split(/\s+/);
+      const commonWords = userBranchWords.filter(word => alumniBranchWords.includes(word) && word.length > 3);
+      if (commonWords.length >= 1) {
+        score += 10; // Weak match
+      }
     }
   }
   totalWeight += 20;
@@ -274,8 +298,8 @@ export async function findMatchingUniversities(
     }),
     }));
 
-    // Filter matches with score >= 50
-    const validMatches = matches.filter((m) => m.score >= 50);
+    // Filter matches with score >= 40 (lowered threshold for better results)
+    const validMatches = matches.filter((m) => m.score >= 40);
 
     // Group by university and course
     const universityMap = new Map<string, {
