@@ -161,3 +161,4 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// Build fix: Ensure proper JSON serialization for Prisma
