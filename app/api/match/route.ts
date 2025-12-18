@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { findMatchingUniversities, UserProfile } from '@/lib/matching';
 import { prisma } from '@/lib/db';
+import { Prisma } from '@prisma/client';
 
 export async function POST(request: NextRequest) {
   try {
@@ -117,7 +118,7 @@ export async function POST(request: NextRequest) {
           userBranch: userProfile.bachelorsBranch,
           userCollege: userProfile.college,
           userCourses: userProfile.mastersPrograms,
-          universities: matchedUniversities,
+          universities: JSON.parse(JSON.stringify(matchedUniversities)) as Prisma.InputJsonValue,
         },
       });
       console.log('✅ Search query saved to database:', savedResult.id);
