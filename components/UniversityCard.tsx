@@ -10,6 +10,13 @@ interface UniversityCardProps {
   };
 }
 
+// Helper function to validate year (between 1990 and current year + 5)
+function isValidYear(year: number | null): boolean {
+  if (!year) return false;
+  const currentYear = new Date().getFullYear();
+  return year >= 1990 && year <= currentYear + 5;
+}
+
 export default function UniversityCard({
   university,
   course,
@@ -49,7 +56,7 @@ export default function UniversityCard({
 
       <div className="flex items-center justify-between text-sm text-gray-600 mt-4 pt-4 border-t border-gray-100">
         <span>{alumniCount} similar profile{alumniCount !== 1 ? 's' : ''}</span>
-        {admittedYearRange.min && (
+        {admittedYearRange.min && isValidYear(admittedYearRange.min) && (
           <span>
             Admitted: {admittedYearRange.min}
           </span>

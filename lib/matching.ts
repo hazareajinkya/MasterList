@@ -334,7 +334,11 @@ export async function findMatchingUniversities(
       uni.scores.reduce((sum, score) => sum + score, 0) / uni.scores.length
     );
     
-    const validYears = uni.years.filter((y): y is number => y !== null);
+    // Filter out invalid years (only keep years between 1990 and current year + 5)
+    const currentYear = new Date().getFullYear();
+    const validYears = uni.years.filter((y): y is number => 
+      y !== null && y >= 1990 && y <= currentYear + 5
+    );
     const yearRange = {
       min: validYears.length > 0 ? Math.min(...validYears) : null,
       max: validYears.length > 0 ? Math.max(...validYears) : null,
@@ -348,6 +352,13 @@ export async function findMatchingUniversities(
       alumniCount: uni.scores.length,
       admittedYearRange: yearRange,
       };
+    })
+    // Filter out IIIT H entries
+    .filter((uni) => {
+      const universityName = uni.university.toLowerCase();
+      return !universityName.includes('iiit h') && 
+             !universityName.includes('iiith') &&
+             !universityName.includes('iiit-h');
     });
 
     // Sort by match percentage (descending)
