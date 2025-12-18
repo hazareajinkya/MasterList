@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { findMatchingUniversities, UserProfile } from '@/lib/matching';
+import { prisma } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -105,6 +106,28 @@ export async function POST(request: NextRequest) {
     } catch (matchError) {
       console.error('Error in findMatchingUniversities:', matchError);
       throw matchError;
+    }
+
+    // Save search query to database (non-blocking)
+    try {
+      const savedResult = await prisma.matchResult.create({
+        data: {
+          userCGPA: cgpa,
+          userWorkEx: workExperience,
+          userBranch: userProfile.bachelorsBranch,
+          userCollege: userProfile.college,
+          userCourses: userProfile.mastersPrograms,
+          universities: matchedUniversities,
+        },
+      });
+      console.log('✅ Search query saved to database:', savedResult.id);
+    } catch (saveError) {
+      // Don't fail the request if saving fails, but log the error
+      console.error('❌ Error saving search query:', saveError);
+      if (saveError instanceof Error) {
+        console.error('Error message:', saveError.message);
+        console.error('Error stack:', saveError.stack);
+      }
     }
 
     try {
