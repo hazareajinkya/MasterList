@@ -23,28 +23,28 @@ export default function Features() {
   ];
 
   return (
-    <section className="py-8 md:py-10 bg-white">
+    <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 text-center">
+        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
           Why Choose <span className="text-primary">Master List</span>?
         </h2>
-        <p className="text-base md:text-lg text-gray-600 text-center mb-6 md:mb-8">
+        <p className="text-xl text-gray-600 text-center mb-12">
           Probability-based insights from publicly available alumni admission data
         </p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-white border border-gray-200 rounded-lg p-4 md:p-5 hover:shadow-lg transition-shadow"
+              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow"
             >
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold text-lg mb-3">
+              <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl mb-4">
                 {feature.number}
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1.5">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 {feature.title}
               </h3>
-              <p className="text-sm md:text-base text-gray-600 leading-relaxed">{feature.description}</p>
+              <p className="text-gray-600">{feature.description}</p>
             </div>
           ))}
         </div>
